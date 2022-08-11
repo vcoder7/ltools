@@ -1,7 +1,7 @@
 {
     "name": "vcoder7/ltools",
     "description": "Laravel helper tools",
-    "version": "v0.0.1",
+    "version": "v0.0.2",
     "type": "laravel-plugin",
     "license": "MIT",
     "autoload": {
