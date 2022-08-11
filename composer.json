@@ -1,0 +1,30 @@
+{
+    "name": "vcoder7/ltools",
+    "description": "Laravel helper tools",
+    "version": "v0.0.1",
+    "type": "laravel-plugin",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Vcoder7\\Ltools\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Mladen Vukovic",
+            "email": "mastertools32@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.3 | ^8.1",
+        "illuminate/console": "5.0 - 5.8 | ^6.0 | ^7.0 | ^8.0 | ^9.0",
+        "illuminate/support": "5.0 - 5.8 | ^6.0 | ^7.0 | ^8.0 | ^9.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Vcoder7\\Ltools\\PackageServiceProvider"
+            ]
+        }
+    }
+}
