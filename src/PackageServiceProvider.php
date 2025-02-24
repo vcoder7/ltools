@@ -13,6 +13,8 @@ class PackageServiceProvider extends ServiceProvider
             $this->commands([
                 CacheFullClear::class,
             ]);
+
+            $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         }
     }
 }
