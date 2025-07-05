@@ -3,7 +3,7 @@
 namespace Vcoder7\Ltools;
 
 use Illuminate\Support\ServiceProvider;
-use Vcoder7\Ltools\Console\Commands\CacheFullClear;
+use Vcoder7\Ltools\Console\Commands\{CacheClearCommand, CacheFullClearCommand};
 
 class PackageServiceProvider extends ServiceProvider
 {
@@ -11,10 +11,20 @@ class PackageServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                CacheFullClear::class,
+                CacheFullClearCommand::class,
+                CacheClearCommand::class,
             ]);
 
             $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         }
+
+        $this->publishes([
+            __DIR__.'/../config/ltools.php' => config_path('ltools.php'),
+        ], 'ltools-config');
+    }
+
+    public function register(): void
+    {
+        $this->mergeConfigFrom(__DIR__ . '/../config/ltools.php', 'ltools');
     }
 }

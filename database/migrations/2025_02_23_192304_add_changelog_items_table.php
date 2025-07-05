@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ltools_changelog_items', function (Blueprint $table) {
+        Schema::create(config('ltools.table_name_changelog_items'), function (Blueprint $table) {
             $table->id();
             $table->string('model_id');
             $table->text('model')->index('IDX_model');
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ltools_changelog_items');
+        Schema::dropIfExists(config('ltools.table_name_changelog_items'));
     }
 };
