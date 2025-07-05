@@ -10,7 +10,7 @@ composer require vcoder7/ltools
 ##### Clear application, route, config and view cache
 
 ```
-php artisan ltools:cache_full_clear
+php artisan ltools:cache-clear
 ```
 
 # Traits
