@@ -13,6 +13,8 @@ class ChangelogItem extends Model
 
     protected $fillable = ['model_id', 'model', 'changes', 'user_id'];
 
+    public $timestamps = false;
+
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->json('changes');
             $table->bigInteger('user_id')->nullable();
             $table->uuid()->unique('UQ_uuid');
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
         });
     }
 
