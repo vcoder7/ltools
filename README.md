@@ -37,3 +37,8 @@ Publish config:
 ```
 php artisan vendor:publish --tag=ltools-config
 ```
+
+Publish migrations:
+```
+php artisan vendor:publish --tag=ltools-migrations
+```

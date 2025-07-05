@@ -9,7 +9,14 @@ class ChangelogItem extends Model
 {
     use CreateUuidTrait;
 
-    protected $table = 'ltools_changelog_items';
+    protected $table;
 
     protected $fillable = ['model_id', 'model', 'changes', 'user_id'];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->setTable(config('ltools.table_name_changelog_items', 'ltools_changelog_items'));
+    }
 }
