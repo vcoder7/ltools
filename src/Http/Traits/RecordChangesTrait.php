@@ -3,13 +3,12 @@
 namespace Vcoder7\Ltools\Http\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Arr;
 use Vcoder7\Ltools\Models\ChangelogItem;
 
 trait RecordChangesTrait
 {
-    //protected array $excludedChangelogFields = [];
-
     public static function bootRecordChangesTrait(): void
     {
         static::created(function (Model $model) {
@@ -47,5 +46,10 @@ trait RecordChangesTrait
                 'changes' => json_encode($diff),
             ]);
         });
+    }
+
+    public function changelogs(): MorphMany
+    {
+        return $this->morphMany(ChangelogItem::class, static::class, 'model', 'model_id');
     }
 }
