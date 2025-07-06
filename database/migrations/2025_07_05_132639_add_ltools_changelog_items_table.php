@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create(config('ltools.table_name_changelog_items'), function (Blueprint $table) {
             $table->id();
-            $table->string('model_id');
             $table->text('model')->index('IDX_model');
+            $table->string('model_id');
             $table->json('changes');
             $table->bigInteger('user_id')->nullable();
-            $table->uuid()->unique('UQ_uuid');
+            $table->uuid()->unique('IDX_uuid');
             $table->timestamp('created_at')->useCurrent();
+
+            $table->index(['model', 'model_id'], 'IDX_model__model_id');
         });
     }
 
