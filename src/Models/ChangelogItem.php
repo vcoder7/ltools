@@ -16,6 +16,10 @@ class ChangelogItem extends Model
 
     public $timestamps = false;
 
+    protected $casts = [
+        'changes' => 'json',
+    ];
+
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);

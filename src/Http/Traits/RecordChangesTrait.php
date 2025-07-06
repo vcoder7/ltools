@@ -43,7 +43,7 @@ trait RecordChangesTrait
                 'model_id' => $model->id,
                 'model' => $model::class,
                 'user_id' => auth()->user()?->id,
-                'changes' => json_encode($diff),
+                'changes' => $diff,
             ]);
         });
     }
