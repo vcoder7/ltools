@@ -19,4 +19,11 @@ return [
     */
     'global_excluded_changelog_fields' => ['created_at', 'updated_at'],
 
+    /*
+    |--------------------------------------------------------------------------
+    | User model class for correct user relation
+    |--------------------------------------------------------------------------
+    */
+    'user_model_class' => \App\Models\User::class,
+
 ];

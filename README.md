@@ -33,6 +33,8 @@ class MyModel extends Model
 ```
 
 # Changelogs
+### Setup:
+
 Publish config:
 ```
 php artisan vendor:publish --tag=ltools-config
@@ -41,4 +43,27 @@ php artisan vendor:publish --tag=ltools-config
 Publish migrations:
 ```
 php artisan vendor:publish --tag=ltools-migrations
+```
+**Enable changelogs for one model**, add to the model `Vcoder7\Ltools\Http\Traits\RecordChangesTrait`
+
+Example:
+```
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Vcoder7\Ltools\Http\Traits\RecordChangesTrait;
+
+class User extends Model
+{
+    use RecordChangesTrait;
+}
+```
+
+**Exclude fields from change logging**
+
+Add to your model:
+```
+protected array $excludedChangelogFields = ['created_at', 'updated_at', 'email', 'credit_card_number'];
 ```

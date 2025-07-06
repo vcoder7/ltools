@@ -3,6 +3,7 @@
 namespace Vcoder7\Ltools\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Vcoder7\Ltools\Http\Traits\CreateUuidTrait;
 
 class ChangelogItem extends Model
@@ -20,5 +21,14 @@ class ChangelogItem extends Model
         parent::__construct($attributes);
 
         $this->setTable(config('ltools.table_name_changelog_items', 'ltools_changelog_items'));
+    }
+
+
+
+    // Relations
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(config('ltools.user_model_class'));
     }
 }
