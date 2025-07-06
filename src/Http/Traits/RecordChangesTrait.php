@@ -3,10 +3,13 @@
 namespace Vcoder7\Ltools\Http\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Vcoder7\Ltools\Models\ChangelogItem;
 
 trait RecordChangesTrait
 {
+    //protected array $excludedChangelogFields = [];
+
     public static function bootRecordChangesTrait(): void
     {
         static::created(function (Model $model) {
@@ -19,14 +22,22 @@ trait RecordChangesTrait
 
         static::updated(function (Model $model) {
             $original = $model->getOriginal();
-            $changes = $model->getChanges();
+            $excludedFields = \array_values(\array_unique(\array_merge($model->excludedChangelogFields ?? [], config('ltools.global_excluded_changelog_fields'))));
+            $changes = Arr::except($model->getChanges(), $excludedFields);
+
             if (count($changes) < 1) {
                 return;
             }
 
             $diff = [];
-            foreach ($changes as $field => $value) {
-                $diff[$field] = ['old_value' => $original[$field] ?? null, 'new_value' => $value];
+            foreach ($changes as $fieldName => $value) {
+                $oldValue = $original[$fieldName] ?? null;
+                $newValue = $model->{$fieldName};
+                if ($newValue === $oldValue) {
+                    continue;
+                }
+
+                $diff[$fieldName] = ['old_value' => $original[$fieldName] ?? null, 'new_value' => $model->{$fieldName}];
             }
 
             ChangelogItem::create([
