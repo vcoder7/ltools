@@ -1,0 +1,9 @@
+{
+    "preset": "psr12",
+    "rules": {
+        "braces": true
+    },
+    "exclude": [
+        "vendor"
+    ]
+}

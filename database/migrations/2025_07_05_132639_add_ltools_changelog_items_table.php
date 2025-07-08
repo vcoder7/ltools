@@ -4,21 +4,22 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('ltools_changelog_items', function (Blueprint $table) {
+        Schema::create(config('ltools.table_name_changelog_items'), function (Blueprint $table) {
             $table->id();
-            $table->string('model_id');
             $table->text('model')->index('IDX_model');
+            $table->string('model_id');
             $table->json('changes');
             $table->bigInteger('user_id')->nullable();
-            $table->uuid()->unique('UQ_uuid');
-            $table->timestamps();
+            $table->uuid()->unique('IDX_uuid');
+            $table->timestamp('created_at')->useCurrent();
+
+            $table->index(['model', 'model_id'], 'IDX_model__model_id');
         });
     }
 
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ltools_changelog_items');
+        Schema::dropIfExists(config('ltools.table_name_changelog_items'));
     }
 };
