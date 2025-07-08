@@ -4,6 +4,7 @@ namespace Vcoder7\Ltools;
 
 use Illuminate\Support\ServiceProvider;
 use Vcoder7\Ltools\Console\Commands\{CacheClearCommand, CacheFullClearCommand};
+use Vcoder7\Ltools\Services\ChangelogService;
 
 class PackageServiceProvider extends ServiceProvider
 {
@@ -30,5 +31,9 @@ class PackageServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/ltools.php', 'ltools');
+
+        $this->app->singleton(ChangelogService::class, function () {
+            return new ChangelogService();
+        });
     }
 }

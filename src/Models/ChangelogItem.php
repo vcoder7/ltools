@@ -10,6 +10,8 @@ class ChangelogItem extends Model
 {
     use CreateUuidTrait;
 
+    private const string DEFAULT_TABLE_NAME = 'ltools_changelog_items';
+
     protected $table;
 
     protected $fillable = ['model_id', 'model', 'changes', 'user_id'];
@@ -24,7 +26,7 @@ class ChangelogItem extends Model
     {
         parent::__construct($attributes);
 
-        $this->setTable(config('ltools.table_name_changelog_items', 'ltools_changelog_items'));
+        $this->setTable(config('ltools.table_name_changelog_items', self::DEFAULT_TABLE_NAME));
     }
 
 

@@ -29,5 +29,14 @@
                 "Vcoder7\\Ltools\\PackageServiceProvider"
             ]
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.2",
+        "mockery/mockery": "^1.6",
+        "orchestra/testbench": "^10.4",
+        "laravel/pint": "^1.23"
+    },
+    "scripts": {
+        "pint": "pint"
     }
 }
