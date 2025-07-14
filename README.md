@@ -3,6 +3,7 @@
 
 - [Cache clear command](#cache_clear_command)
 - [Automatic ``uuid`` field value generation](#automatic_uuid_value_generation)
+- [Str ``initials`` helper (macro)](#str_class_macros)
 - [Changelog integration](#changelog_integration)
 
 #### Installation
@@ -31,6 +32,15 @@ class MyModel extends Model
 {
     use HasFactory, CreateUuidTrait;
 }
+```
+### [Str ``initials`` helper (macro)](#str_class_macros)
+The `Str::initials()` macro returns the uppercase initials of a given name string. It intelligently trims whitespace and handles multi-word names.
+
+Usage:
+```
+use Illuminate\Support\Str;
+
+Str::initials('John Peter Smith'); // Returns: "JPS"
 ```
 
 ### [Changelog integration](#changelog_integration)

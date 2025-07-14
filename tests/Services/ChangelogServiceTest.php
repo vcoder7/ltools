@@ -2,9 +2,9 @@
 
 namespace Vcoder7\Ltools\Tests\Services;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Database\Eloquent\Model;
 use Vcoder7\Ltools\Http\Traits\CreateUuidTrait;
 use Vcoder7\Ltools\Models\ChangelogItem;
 use Vcoder7\Ltools\Services\ChangelogService;

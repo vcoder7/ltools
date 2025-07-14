@@ -4,7 +4,7 @@ namespace Vcoder7\Ltools;
 
 use Illuminate\Support\ServiceProvider;
 use Vcoder7\Ltools\Console\Commands\{CacheClearCommand, CacheFullClearCommand};
-use Vcoder7\Ltools\Services\ChangelogService;
+use Vcoder7\Ltools\Services\{ChangelogService, StrMacroService};
 
 class PackageServiceProvider extends ServiceProvider
 {
@@ -32,8 +32,9 @@ class PackageServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/ltools.php', 'ltools');
 
-        $this->app->singleton(ChangelogService::class, function () {
-            return new ChangelogService();
-        });
+        $this->app->register(MacroServiceProvider::class);
+
+        $this->app->singleton(StrMacroService::class, fn () => new StrMacroService());
+        $this->app->singleton(ChangelogService::class, fn () => new ChangelogService());
     }
 }

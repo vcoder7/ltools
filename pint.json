@@ -1,6 +1,13 @@
 {
     "preset": "psr12",
     "rules": {
+        "group_import": true,
+        "single_import_per_statement": false,
+        "ordered_imports": {
+            "sort_algorithm": "alpha",
+            "imports_order": ["class", "function", "const"]
+        },
+        "single_line_after_imports": true,
         "braces": true
     },
     "exclude": [
