@@ -26,7 +26,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Vcoder7\\Ltools\\PackageServiceProvider"
+                "Vcoder7\\Ltools\\PackageServiceProvider",
+                "Vcoder7\\Ltools\\MacroServiceProvider"
             ]
         }
     },
