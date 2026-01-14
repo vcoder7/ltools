@@ -12,7 +12,7 @@ return new class () extends Migration {
     {
         Schema::create(config('ltools.table_name_changelog_items'), function (Blueprint $table) {
             $table->id();
-            $table->text('model')->index('IDX_model');
+            $table->text('model');
             $table->string('model_id');
             $table->json('changes');
             $table->bigInteger('user_id')->nullable();

@@ -85,3 +85,11 @@ protected array $excludedChangelogFields = ['created_at', 'updated_at', 'email',
 $page = Page::find(1);
 $changelogs = $page->changelogs;
 ```
+**PGSQL driver check**
+```
+$table->isPgsqlDriver(function (Blueprint $table) {
+    $table->jsonb('options')->nullable();
+})->else(function (Blueprint $table) {
+    $table->json('options')->nullable();
+});
+```
