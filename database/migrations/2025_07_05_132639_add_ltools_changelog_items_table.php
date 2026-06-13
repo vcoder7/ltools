@@ -12,7 +12,10 @@ return new class () extends Migration {
     {
         Schema::create(config('ltools.table_name_changelog_items'), function (Blueprint $table) {
             $table->id();
-            $table->text('model');
+            // Stores a model FQCN — keep it a VARCHAR so it can be indexed.
+            // MySQL cannot index TEXT/BLOB without a key length (error 1170),
+            // whereas PostgreSQL can; VARCHAR(255) works on both.
+            $table->string('model');
             $table->string('model_id');
             $table->json('changes');
             $table->bigInteger('user_id')->nullable();
