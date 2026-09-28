@@ -66,6 +66,7 @@ class AuditServiceTest extends TestCase
             $table->id();
             $table->string('name')->nullable();
             $table->string('password')->nullable();
+            $table->timestamp('removed_at')->nullable();
             $table->timestamps();
         });
     }
@@ -209,6 +210,67 @@ class AuditServiceTest extends TestCase
         $this->assertFalse($result['intact']);
         $this->assertSame($target->id, $result['broken_at_id']);
         $this->assertNotNull($result['broken_at_uuid']);
+    }
+
+    public function test_an_uncast_datetime_attribute_still_verifies(): void
+    {
+        // The production case: `$user->fully_removed_at = new \DateTime()` on a column the
+        // model does not cast. The diff then carries a DateTime OBJECT, which comes back
+        // from the JSON column as a key-sorted array.
+        $widget = Widget::create(['name' => 'A']);
+        $widget->removed_at = new \DateTime('2026-08-31 16:32:41.815901');
+        $widget->save();
+
+        $audit = AuditLog::query()->latest('id')->first();
+
+        $this->assertSame(['date', 'timezone_type', 'timezone'], array_keys($audit->new_values['removed_at']));
+        $this->assertTrue($audit->verifyHash());
+        $this->assertTrue(app(AuditChainVerifier::class)->verify()['intact']);
+    }
+
+    public function test_objects_in_meta_still_verify(): void
+    {
+        $meta = (object) ['zeta' => 1, 'alpha' => (object) ['b' => 2, 'a' => 1]];
+
+        Audit::log('custom_event', ['meta' => ['when' => new \DateTimeImmutable('2026-01-02 03:04:05'), 'payload' => $meta]]);
+
+        $this->assertTrue(AuditLog::query()->latest('id')->first()->verifyHash());
+    }
+
+    public function test_a_row_hashed_by_the_pre_fix_algorithm_still_verifies_and_still_detects_edits(): void
+    {
+        $date = new \DateTime('2026-08-31 16:32:41.815901');
+        $attributes = [
+            'event' => 'updated',
+            'auditable_type' => Widget::class,
+            'auditable_id' => '7',
+            'old_values' => ['removed_at' => null],
+            'new_values' => ['removed_at' => $date],
+            'is_sensitive' => false,
+            'created_at' => '2026-08-31 16:32:41',
+        ];
+
+        // The v1.1.0 hash: arrays key-sorted, the DateTime object left in its native order.
+        $canonical = [];
+        foreach (AuditLog::HASHED_FIELDS as $field) {
+            $value = $attributes[$field] ?? null;
+            if (is_array($value)) {
+                ksort($value);
+            }
+            $canonical[$field] = $value;
+        }
+        $canonical['prev_hash'] = null;
+        $legacyHash = hash('sha256', json_encode($canonical, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+
+        $row = AuditLog::query()->create(array_merge($attributes, ['prev_hash' => null, 'hash' => $legacyHash]));
+
+        $this->assertTrue(AuditLog::query()->find($row->id)->verifyHash(), 'a genuine legacy row verifies');
+
+        $stored = json_decode(json_encode(['removed_at' => $date]), true);
+        $stored['removed_at']['date'] = '2026-09-01 00:00:00.000000';
+        AuditLog::query()->where('id', $row->id)->update(['new_values' => json_encode($stored)]);
+
+        $this->assertFalse(AuditLog::query()->find($row->id)->verifyHash(), 'editing the date still breaks it');
     }
 }
 

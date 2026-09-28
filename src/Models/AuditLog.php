@@ -103,7 +103,7 @@ class AuditLog extends Model
      * Compute the tamper-evidence hash for a row's immutable content + the previous row's hash.
      * Deterministic: arrays are recursively key-sorted and dates normalised to second precision.
      */
-    public static function hashPayload(array $attributes, ?string $prevHash): string
+    public static function hashPayload(array $attributes, ?string $prevHash, bool $legacyDateTimeOrder = false): string
     {
         $canonical = [];
 
@@ -112,9 +112,16 @@ class AuditLog extends Model
 
             if ($value instanceof DateTimeInterface) {
                 $value = $value->format('Y-m-d H:i:s');
+            } elseif (is_array($value) || is_object($value)) {
+                // Hash what the row will READ BACK as, not the in-memory PHP value. JSON
+                // columns store the json_encode() of the value, and an object inside it
+                // (a plain DateTime, stdClass, JsonSerializable) comes back as an array —
+                // which normalize() then key-sorts, while the object itself was not sorted
+                // at write time. Round-tripping here makes write and verify hash the same thing.
+                $value = self::jsonRoundTrip($value);
             }
 
-            $canonical[$field] = self::normalize($value);
+            $canonical[$field] = self::normalize($value, $legacyDateTimeOrder);
         }
 
         $canonical['prev_hash'] = $prevHash;
@@ -139,17 +146,51 @@ class AuditLog extends Model
                 : $this->{$field};
         }
 
-        return hash_equals($this->hash, self::hashPayload($attributes, $this->prev_hash));
-    }
-
-    private static function normalize($value)
-    {
-        if (is_array($value)) {
-            ksort($value);
-
-            return array_map([self::class, 'normalize'], $value);
+        if (hash_equals($this->hash, self::hashPayload($attributes, $this->prev_hash))) {
+            return true;
         }
 
-        return $value;
+        // Rows written before v1.1.1 hashed a plain PHP DateTime inside old/new values or meta
+        // in its native json order (date, timezone_type, timezone) while verification sorted
+        // it. That order is known, so those rows can still be proven unchanged. Only the key
+        // ORDER of that one exact shape differs — the content must still match to the byte.
+        return hash_equals($this->hash, self::hashPayload($attributes, $this->prev_hash, legacyDateTimeOrder: true));
+    }
+
+    private static function jsonRoundTrip(array|object $value): mixed
+    {
+        $json = json_encode($value);
+
+        return $json === false ? $value : json_decode($json, true);
+    }
+
+    private static function normalize($value, bool $legacyDateTimeOrder = false)
+    {
+        if (! is_array($value)) {
+            return $value;
+        }
+
+        if ($legacyDateTimeOrder && self::isSerializedDateTime($value)) {
+            return [
+                'date' => $value['date'],
+                'timezone_type' => $value['timezone_type'],
+                'timezone' => $value['timezone'],
+            ];
+        }
+
+        ksort($value);
+
+        return array_map(fn ($v) => self::normalize($v, $legacyDateTimeOrder), $value);
+    }
+
+    /**
+     * The exact shape json_encode() gives a plain DateTime / DateTimeImmutable.
+     */
+    private static function isSerializedDateTime(array $value): bool
+    {
+        $keys = array_keys($value);
+        sort($keys);
+
+        return $keys === ['date', 'timezone', 'timezone_type'];
     }
 }
